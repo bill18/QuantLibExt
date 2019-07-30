@@ -1,0 +1,12 @@
+{
+	"basis": "30/360",
+	"calendar": "USD",
+	"interpolation": "Linear",
+	"compounding": "Compounded",
+	"frequency": "Annual",
+	"marks": [
+		[20150115, 0.0  ], 
+		[20150715, 0.005], 
+		[20160115, 0.007]]
+
+}

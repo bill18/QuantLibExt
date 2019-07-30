@@ -1,0 +1,11 @@
+{
+  "calendar": "USD",
+  "dates": [
+    20150115,
+    20150715,
+    20160115
+  ],
+  "rolling": "Unadjusted",
+  "term_rolling": "None",
+  "tenor": "6M"
+}

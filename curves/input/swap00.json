@@ -1,0 +1,67 @@
+
+{
+	"Deposits" : 
+	{
+	    "calendar": "TGT",
+	    "settlements": 2,
+	    "rolling": "MF",
+	    "basis": "Act/360",
+	    "month_end": false,        
+		"marks": [
+		    ["1W", 0.0382],
+		    ["1M", 0.0372],
+		    ["3M", 0.0363],
+		    ["6M", 0.0353],
+		    ["9M", 0.0348],
+		    ["1Y", 0.0345]
+		]
+	},
+
+	"FRAs00" : {
+		"fixingDays": 2,
+		"calendar": "TGT",
+		"rolling": "MF",
+		"basis": "Act/360",
+		"month_end": false,
+		"marks": [
+			[3, 6 , 0.037125], 
+		    [6, 9 , 0.037125], 
+		    [9, 12, 0.037125]
+		]
+	},
+
+	"Futures" : {
+        "months":3,
+		"calendar": "TGT",
+		"rolling": "MF",
+		"month_end": true,
+		"basis": "Act/360",
+		"marks": [
+		    [20011219, 96.2875],
+		    [20020320, 96.7875],
+		    [20020619, 96.9875],
+		    [20020918, 96.6875],
+		    [20021218, 96.4875],
+		    [20030319, 96.3875],
+		    [20030618, 96.2875],
+		    [20030917, 96.0875]
+		]
+
+	},
+
+	"Swaps" : {
+		"iborIndex":"Euribor,6M",
+		"fixedLegCalendar": "TGT",
+		"fixedLegAdjustment": "MF",
+		"fixedLegBasis": "Act/360",
+		"fixedLegFrequency": "Annual",
+		"marks": [
+		    [ "2Y", 0.037125],
+		    [ "3Y", 0.0398  ],
+		    [ "5Y", 0.0443  ],
+		    ["10Y", 0.05165 ],
+		    ["15Y", 0.055175]
+	    ]
+	}
+
+}

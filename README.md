@@ -394,7 +394,7 @@ An important consideration for the Calendar Manager is to allow users design the
 
 Strategy Pattern serves this algorithm or procedure substitution purposes.
 
-![Strategy Pattern](./strategy_pattern.png "Strategy Pattern")
+![Strategy Pattern](./images/strategy_pattern.png "Strategy Pattern")
 
 
 #### Calendar Format
@@ -597,7 +597,7 @@ plotCurve('.', dates, rates)
     
 
 
-![png](output_24_1.png)
+![png](./images/output_24_1.png)
 
 
 ###  Builder for Curve with Multiple Instruments
@@ -698,7 +698,7 @@ plotCurve('.', **data)
 ```
 
 
-![png](output_26_0.png)
+![png](./images/output_26_0.png)
 
 
 ## TODO
