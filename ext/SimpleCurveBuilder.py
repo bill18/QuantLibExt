@@ -15,15 +15,15 @@
 import QuantLib as ql
 from . import DatetimeUtils as dtu
 from . import QuantLibClassExt as qlx
-from . import Config as config
-from . import Utils as utils
+from . import URLCurveReqLoader as crvLoder
 
 
-def ZeroCurve(asOfDate, curveId):
-    filePath = config.getCurveInputFile(curveId + '.json')
-    instFileUrl = 'file:///' + filePath
+def ZeroCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+    # filePath = config.getCurveInputFile(curveId + '.json')
+    # instFileUrl = 'file:///' + filePath
 
-    insts = utils.loadJsonFromUrl(instFileUrl)
+    # insts = utils.loadJsonFromUrl(instFileUrl)
+    insts = loader.load(curveId)
     ql.Settings.instance().evaluationDate = dtu.toQLDate(asOfDate)
     dates = [rec[0] for rec in insts['marks']]
     rates = [rec[1] for rec in insts['marks']]
@@ -32,11 +32,12 @@ def ZeroCurve(asOfDate, curveId):
     return curve
 
 
-def DiscountCurve(asOfDate, curveId):
-    filePath = config.getCurveInputFile(curveId + '.json')
-    instFileUrl = 'file:///' + filePath
+def DiscountCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+    # filePath = config.getCurveInputFile(curveId + '.json')
+    # instFileUrl = 'file:///' + filePath
 
-    insts = utils.loadJsonFromUrl(instFileUrl)
+    # insts = utils.loadJsonFromUrl(instFileUrl)
+    insts = loader.load(curveId)
     ql.Settings.instance().evaluationDate = dtu.toQLDate(asOfDate)
     dates = [rec[0] for rec in insts['marks']]
     rates = [rec[1] for rec in insts['marks']]
@@ -45,11 +46,12 @@ def DiscountCurve(asOfDate, curveId):
     return curve
 
 
-def ForwardCurve(asOfDate, curveId):
-    filePath = config.getCurveInputFile(curveId + '.json')
-    instFileUrl = 'file:///' + filePath
+def ForwardCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+    # filePath = config.getCurveInputFile(curveId + '.json')
+    # instFileUrl = 'file:///' + filePath
 
-    insts = utils.loadJsonFromUrl(instFileUrl)
+    # insts = utils.loadJsonFromUrl(instFileUrl)
+    insts = loader.load(curveId)
     ql.Settings.instance().evaluationDate = dtu.toQLDate(asOfDate)
     dates = [rec[0] for rec in insts['marks']]
     rates = [rec[1] for rec in insts['marks']]
