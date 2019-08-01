@@ -17,10 +17,10 @@ import os
 import sqlite3
 
 from . import Config as config
-from .CalendarLoader import CalendarLoader
+from .DataLoader import DataLoader
 
 
-class SQLiteCalendarLoader(CalendarLoader):
+class SQLiteCalendarLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 

@@ -12,14 +12,29 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the license for more details.
 
+from functools import wraps  # This convenience func preserves name and docstring
 import QuantLib as ql
 from . import QuantLibUtils as qlu
 from . import DatetimeUtils as dfs
 from . import CalendarManager as mgr
 from . import Utils as utils
-# from . import QuantLibClassExt as qlx
+from . import QuantLibClassExt as qlx
+
+# decorator to add methods to a class on the fly
+
+
+def add_method(cls):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            return func(*args, **kwargs)
+        setattr(cls, func.__name__, wrapper)
+        # Note we are not binding func, but wrapper which accepts self but does exactly the same as func
+        return func  # returning func means func can still be used normally
+    return decorator
 
 # DepositRateHelper
+
 
 """
 DepositRateHelper   (
@@ -51,10 +66,7 @@ def parseDeposits(data):
         data = [data]
 
     for rec in data:
-        # print(rec)
-
         if 'index' in rec:  # form 2
-            # iborIndexRef = qlu.getMarketIndex(rec['index'])
             temp = [ql.DepositRateHelper(rate,
                                          qlu.getMarketIndex(
                                              rec['index'] + ',' + tenor)
@@ -64,8 +76,6 @@ def parseDeposits(data):
             helpers.extend(temp)
         elif 'tenor' in rec:
             tenor = dfs.parseTenor(rec['tenor'])
-            # print('---------------------------------')
-            # print(tenor)
             calendar = mgr.getCalendar(rec['calendar'])
             rolling = qlu.getRollingConv(rec['rolling'])
             eom = rec['month_end']
@@ -83,9 +93,6 @@ def parseDeposits(data):
                                             dayCount)
                 helpers.append(temp)
         elif 'settlementDays' in rec:  # form 1
-            # tenor = dfs.parseTenor(rec['tenor'])
-            # print('---------------------------------')
-            # print(tenor)
             calendar = mgr.getCalendar(rec['calendar'])
             rolling = qlu.getRollingConv(rec['rolling'])
             eom = rec['month_end']
@@ -250,16 +257,11 @@ def parseFutures(data):
 
     for rec in data:
         if 'index' in rec:
-            # idx, tenor = rec['index'].split(',')
             iborIndex = qlu.getMarketIndex(rec['index'])
-            # iborIndex = iborIndexRef(dfs.parseTenor(tenor))
             temp = [ql.FuturesRateHelper(rate, dfs.toQLDate(iborStartDate), iborIndex)
                     for iborStartDate, rate in rec['marks']]
             helpers.extend(temp)
         elif 'months' in rec:
-            # tenor = dfs.parseTenor(rec['tenor'])
-            # print('---------------------------------')
-            # print(tenor)
             months = int(rec['months'])
             calendar = mgr.getCalendar(rec['calendar'])
             rolling = qlu.getRollingConv(rec['rolling'])
@@ -342,11 +344,9 @@ def parseSwaps(data):
         data = [data]
 
     for rec in data:
-        # idx, tenor = rec['index'].split(',')
         if 'iborIndex' in rec:
             floatIndex = qlu.getMarketIndex(rec['iborIndex'])
             fixedCalendar = mgr.getCalendar(rec["fixedLegCalendar"])
-            # print(rec["fixedLegCalendar"], type(fixedCalendar))
 
             fixedLegFrequency = qlu.getFrequency(rec["fixedLegFrequency"])
             fixedLegAdjustment = qlu.getRollingConv(rec["fixedLegAdjustment"])
@@ -415,20 +415,14 @@ def parseOISs(data):
         data = [data]
 
     for rec in data:
-        # print(rec)
-
         if 'settlementDays' in rec:  # form 2
             settlementDays = rec['settlementDays']
             index = qlu.getMarketIndex(rec['index'])
-            # index = iborIndexRef()
-
             temp = [ql.OISRateHelper(settlementDays, dfs.parseTenor(tenor), ql.QuoteHandle(ql.SimpleQuote(rate)), index) for
                     tenor, rate in rec['marks']]
             helpers.extend(temp)
         else:
-            # print('---------------------------------')
             index = qlu.getMarketIndex(rec['index'])
-            # index = iborIndexRef()
 
             temp = [ql.DatedOISRateHelper(dfs.toQLDate(start_date),
                                           dfs.toQLDate(end_date),
@@ -475,26 +469,19 @@ def parseBonds(data, calc_date=None, rule=None):
         data = [data]
     bond_helpers = []
 
-    # print(type(calc_date), calc_date)
-
     rule = qlu.getDateGenRule(rule)
     for instList in data:
-        # calc_date = dfs.toQLDate(instList['calc_date'])
         day_count = qlu.getDayCountBasis(instList['basis'])
         calendar = mgr.getCalendar(instList["calendar"])
         rolling = qlu.getRollingConv(instList['rolling'])
         frequency = ql.Period(qlu.getFrequency(instList["frequency"]))
         settlement_days = instList['settlement_days']
         face_amount = instList['face_amount']
-        # coupon = instList['coupon']
         eom = instList['month_end']
-        # frequency = ql.Period(6, ql.Months)
 
-        # print(type(calc_date), calc_date)
         for issue_date, maturity_date, coupon, price in instList['marks']:
             issue_date = dfs.toQLDate(issue_date)
             maturity_date = dfs.toQLDate(maturity_date)
-            # print(type(maturity_date), maturity_date)
             schedule = ql.Schedule(calc_date,
                                    maturity_date,
                                    frequency,
@@ -512,27 +499,8 @@ def parseBonds(data, calc_date=None, rule=None):
                                             day_count,
                                             rolling
                                             )
-            # print(helper)
             bond_helpers.append(helper)
-            # termination_date = calc_date + dfs.parseTenor(m)
-            # schedule = qlx.XSchedule(
-            #     calc_date,
-            #     termination_date,
-            #     frequency,
-            #     calendar,
-            #     rolling,
-            #     rolling,
-            #     rule,
-            #     eom)
 
-            # helper = ql.FixedRateBondHelper(ql.QuoteHandle(ql.SimpleQuote(price)),
-            #                                 settlement_days,
-            #                                 face_amount,
-            #                                 schedule,
-            #                                 [coupon],
-            #                                 day_count,
-            #                                 rolling
-            #                                 )
     return bond_helpers
 
 
@@ -553,202 +521,6 @@ def parseAll(insts, calc_date=None):
             helpers.extend(parseBonds(insts[instType], calc_date))
 
     return helpers
-
-
-# Dynamic version of Decorator Pattern: intercept live attributes
-
-class YieldTermStructureDecorator(object):
-    def __init__(self, termStructrure, calendar):
-        self._term_struct = termStructrure
-        self._calendar = calendar
-
-    def __getattr__(self, name):
-        return getattr(self._term_struct, name)
-
-    # =======================================================
-    # DiscountFactor discount(const Date&,
-    #      bool extrapolate = false);
-    # -------------------------------------------------------
-    # DiscountFactor discount(Time,
-    #      bool extrapolate = false);
-    # =======================================================
-    def discount(self, *args):
-        if isinstance(args[0], ql.Date) or dfs.isYYYYMMDD(args[0]):
-            newArgs = [
-                dfs.toQLDate(args[0])
-            ]
-        else:
-            newArgs = [
-                args[0]
-            ]
-
-        if len(args) > 1:
-            newArgs.append(args[1])
-
-        return self._term_struct.discount(*tuple(newArgs))
-
-    # =======================================================
-    # InterestRate zeroRate(const Date& d,
-    #      const DayCounter&,
-    #      Compounding,
-    #      Frequency f = Annual,
-    #      bool extrapolate = false) const;
-    # -------------------------------------------------------
-    # InterestRate zeroRate(Time t,
-    #      Compounding,
-    #      Frequency f = Annual,
-    #      bool extrapolate = false) const;
-    # =======================================================
-    def zeroRate(self, *args):
-        if isinstance(args[1], ql.DayCounter) or isinstance(args[1], str):
-            newArgs = [
-                dfs.toQLDate(args[0]),
-                qlu.getDayCountBasis(args[1]),
-                qlu.getCompoundType(args[2])
-            ]
-
-            if len(args) > 3:
-                newArgs.append(qlu.getFrequency(args[3]))
-            if len(args) > 4:
-                newArgs.append(args[4])
-        else:
-            newArgs = [
-                args[0],
-                qlu.getCompoundType(args[1])
-            ]
-
-            if len(args) > 2:
-                newArgs.append(qlu.getFrequency(args[2]))
-            if len(args) > 3:
-                newArgs.append(args[3])
-
-        return self._term_struct.zeroRate(*tuple(newArgs))
-
-    # =======================================================
-    # InterestRate forwardRate(const Date& d1,
-    #      const Date& d2,
-    #      const DayCounter&,
-    #      Compounding,
-    #      Frequency f = Annual,
-    #      bool extrapolate = false) const;
-    # -------------------------------------------------------
-    # InterestRate forwardRate(Time t1,
-    #      Time t2,
-    #      Compounding,
-    #      Frequency f = Annual,
-    #      bool extrapolate = false) const;
-    # =======================================================
-    def forwardRate(self, *args):
-        if isinstance(args[2], ql.DayCounter) or isinstance(args[2], str):
-            newArgs = [
-                dfs.toQLDate(args[0]),
-                dfs.toQLDate(args[1]),
-                qlu.getDayCountBasis(args[2]),
-                qlu.getCompoundType(args[3])
-            ]
-
-            if len(args) > 4:
-                newArgs.append(qlu.getFrequency(args[4]))
-            if len(args) > 5:
-                newArgs.append(args[5])
-        else:
-            newArgs = [
-                args[0],
-                args[1],
-                qlu.getCompoundType(args[2])
-            ]
-
-            if len(args) > 3:
-                newArgs.append(qlu.getFrequency(args[3]))
-            if len(args) > 4:
-                newArgs.append(args[4])
-
-        return self._term_struct.forwardRate(*tuple(newArgs))
-
-    # def zeroRate(self, endDate, compounding=ql.Compounded, freq=ql.Annual):
-    #     endDate = endDate if isinstance(
-    #         endDate, ql.Date) else dfs.toQLDate(endDate)
-    #     compounding = compounding if isinstance(
-    #         compounding, int) else qlu.getCompoundType(compounding)
-    #     startDate = self._term_struct.referenceDate()
-    #     dc = self._term_struct.dayCounter()
-    #     years = dc.yearFraction(startDate, endDate)
-    #     freq = freq if isinstance(
-    #         freq, int) else qlu.getFrequency(freq)
-    #     return self._term_struct.zeroRate(years, compounding, freq)
-
-    # def discount(self, endDate, extrapolate=False):
-    #     endDate = endDate if isinstance(
-    #         endDate, ql.Date) else dfs.toQLDate(endDate)
-    #     return self._term_struct.discount(endDate, extrapolate)
-
-    # def forwardRate(self, startDate, endDate, dayCount=None, compounding=ql.Compounded, freq=ql.Annual):
-    #     if dayCount is None:
-    #         dayCount = self._term_struct.dayCounter()
-    #     else:
-    #         dayCount = dayCount if isinstance(
-    #             dayCount, ql.DayCounter) else qlu.getDayCountBasis(dayCount)
-    #     startDate = startDate if isinstance(
-    #         startDate, ql.Date) else dfs.toQLDate(startDate)
-    #     endDate = endDate if isinstance(
-    #         endDate, ql.Date) else dfs.toQLDate(endDate)
-    #     compounding = compounding if isinstance(
-    #         compounding, int) else qlu.getCompoundType(compounding)
-    #     freq = freq if isinstance(
-    #         freq, int) else qlu.getFrequency(freq)
-    #     return self._term_struct.forwardRate(startDate, endDate, dayCount, compounding, freq)
-
-    def oneDayForwardRates(self, period, calendar, startDate=None, dayCount=None, compounding=ql.Compounded, freq=ql.Annual):
-        startDate = startDate if startDate is not None else self._term_struct.referenceDate()
-        startDate = startDate if isinstance(
-            startDate, ql.Date) else dfs.toQLDate(startDate)
-        period = period if isinstance(
-            period, ql.Period) else qlu.parseTenor(period)
-        endDate = startDate + period
-        if dayCount is None:
-            dayCount = self._term_struct.dayCounter()
-        else:
-            dayCount = dayCount if isinstance(
-                dayCount, ql.DayCounter) else qlu.getDayCountBasis(dayCount)
-        dates = [ql.Date(serial)
-                 for serial
-                 in range(startDate.serialNumber(), endDate.serialNumber() + 1)]
-
-        if calendar is None and self._calendar is None:
-            raise RuntimeError('You must provide a calendar')
-
-        if calendar is None:
-            calendar = self._term_struct.calendar()
-        else:
-            calendar = calendar if isinstance(
-                calendar, ql.Calendar) else mgr.getCalendar(calendar)
-
-        # print('... in oneDayForwardRates ...', calendar, type(calendar), ' ...')
-        rates = [self.forwardRate(d,
-                                  calendar.advance(d, 1, ql.Days), dayCount, compounding, freq).rate()
-                 for d in dates]
-        # print(rates)
-        return {'dates': dates, 'rates': rates}
-
-    # Two methods we don't actually want to intercept,
-    # but iter() and next() will be upset without them.
-
-    # def __iter__(self):
-    #     return self._term_struct.__iter__()
-
-    # def __next__(self):
-    #     return self._term_struct.__next__()
-
-    # Offer every other method and property dynamically.
-
-    # def __getattr__(self, name):
-    #     return getattr(self._term_struct, name)
-
-    # def __setattr__(self, name, value):
-    #     setattr(self._term_struct, name, value)
-
-    # def __delattr__(self, name):
-    #     delattr(self._term_struct, name)
 
 
 """
@@ -784,8 +556,6 @@ def buildCurve(curveEngine, asOfDate, basis, insts, calendar=None, enableExtrapo
                        for v in insts["Turns"]['values']]
 
     if calendar is None:
-        # print(jump_dates)
-        # print(jump_values)
         if jump_dates is None or jump_values is None:
             curve = engineRef(evalDate,
                               helpers,
@@ -815,11 +585,9 @@ def buildCurve(curveEngine, asOfDate, basis, insts, calendar=None, enableExtrapo
         curve.enableExtrapolation()
 
     if curve is not None:
-        return YieldTermStructureDecorator(curve, calendar)
+        return qlx.TermStructDecorator(curve)
     else:
         return None
-
-# instFileUrl can be either file or http URL
 
 
 def buildCurveWithJson(curveEngine, asOfDate, basis, instFileUrl, calendar=None, enableExtrapolation=True):

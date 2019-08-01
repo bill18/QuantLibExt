@@ -13,8 +13,8 @@
 # FOR A PARTICULAR PURPOSE.  See the license for more details.
 
 
-class CalendarLoader(object):
-    """docstring for CalendarLoader"""
+class DataLoader(object):
+    """docstring for DataLoader"""
 
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
