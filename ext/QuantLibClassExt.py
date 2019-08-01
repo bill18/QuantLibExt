@@ -1,10 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 28 10:28:54 2019
+# Copyright (C) 2019 Wenhua Wang
+#
+# This file is part of QuantLibExt, which is an extension to the
+# free-software/open-source quantitative library QuantLib - http://quantlib.org/
+#
+# QuantLibExt is free software: you can redistribute it and/or modify it
+# under the terms of the BSD license.
+#
+# QuantLib's license is at <http://quantlib.org/license.shtml>.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the license for more details.
 
-@author: wenhua
-"""
-# import sys
 import QuantLib as ql
 from . import QuantLibUtils as qlu
 from . import DatetimeUtils as dfs
@@ -701,6 +708,14 @@ def FixedRateBondForward(*args):
     fwd = XFixedRateBondForward(*args)
     return ForwardDecorator(fwd)
 
+# InterpolatedZeroCurve(const std::vector<Date>& dates,
+#                       const std::vector<Rate>& yields,
+#                       const DayCounter& dayCounter,
+#                       const Calendar& calendar = Calendar(),
+#                       const Interpolator& i = Interpolator(),
+#                       Compounding compounding = Continuous,
+#                       Frequency frequency = Annual);
+
 
 class XZeroCurve(ql.ZeroCurve):
     def __init__(self, *args):
@@ -831,4 +846,60 @@ class TermStructDecorator(object):
 
 def ZeroCurve(*args):
     crv = XZeroCurve(*args)
+    return TermStructDecorator(crv)
+
+
+# InterpolatedDiscountCurve(const std::vector<Date>& dates,
+#                           const std::vector<DiscountFactor>& discounts,
+#                           const DayCounter& dayCounter,
+#                           const Calendar& calendar = Calendar(),
+#                           const Interpolator& i = Interpolator());
+
+# DiscountFactor is of type "double" in QuantLib C++
+
+class XDiscountCurve(ql.DiscountCurve):
+    def __init__(self, *args):
+        newArgs = [
+            [dfs.toQLDate(dt) for dt in args[0]],
+            args[1],
+            qlu.getDayCountBasis(args[2]),
+        ]
+
+        if len(args) > 3:
+            newArgs.append(clm.getCalendar(args[3]))
+        if len(args) > 4:
+            newArgs.append(args[4])
+
+        super().__init__(*tuple(newArgs))
+
+
+def DiscountCurve(*args):
+    crv = XDiscountCurve(*args)
+    return TermStructDecorator(crv)
+
+#   InterpolatedForwardCurve(const std::vector<Date>& dates,
+#                            const std::vector<Rate>& forwards,
+#                            const DayCounter& dayCounter,
+#                            const Calendar& calendar = Calendar(),
+#                            const Interpolator& i = Interpolator());
+
+
+class XForwardCurve(ql.ForwardCurve):
+    def __init__(self, *args):
+        newArgs = [
+            [dfs.toQLDate(dt) for dt in args[0]],
+            args[1],
+            qlu.getDayCountBasis(args[2]),
+        ]
+
+        if len(args) > 3:
+            newArgs.append(clm.getCalendar(args[3]))
+        if len(args) > 4:
+            newArgs.append(args[4])
+
+        super().__init__(*tuple(newArgs))
+
+
+def ForwardCurve(*args):
+    crv = XForwardCurve(*args)
     return TermStructDecorator(crv)

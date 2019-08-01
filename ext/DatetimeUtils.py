@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-REF: pip install xlrd
-     Library for developers to extract data from Microsoft Excel (tm) spreadsheet files
-"""
+# Copyright (C) 2019 Wenhua Wang
+#
+# This file is part of QuantLibExt, which is an extension to the
+# free-software/open-source quantitative library QuantLib - http://quantlib.org/
+#
+# QuantLibExt is free software: you can redistribute it and/or modify it
+# under the terms of the BSD license.
+#
+# QuantLib's license is at <http://quantlib.org/license.shtml>.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the license for more details.
 
 import datetime as datetime
 import QuantLib as ql

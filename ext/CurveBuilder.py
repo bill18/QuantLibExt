@@ -1,3 +1,17 @@
+# Copyright (C) 2019 Wenhua Wang
+#
+# This file is part of QuantLibExt, which is an extension to the
+# free-software/open-source quantitative library QuantLib - http://quantlib.org/
+#
+# QuantLibExt is free software: you can redistribute it and/or modify it
+# under the terms of the BSD license.
+#
+# QuantLib's license is at <http://quantlib.org/license.shtml>.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the license for more details.
+
 import QuantLib as ql
 from . import QuantLibUtils as qlu
 from . import DatetimeUtils as dfs
@@ -27,7 +41,7 @@ DepositRateHelper   (
 """
 
 
-def parseDeports(data):
+def parseDeposits(data):
     if data is None:
         return None
 
@@ -526,7 +540,7 @@ def parseAll(insts, calc_date=None):
     helpers = []
     for instType in insts.keys():
         if instType == 'Deposits':
-            helpers.extend(parseDeports(insts[instType]))
+            helpers.extend(parseDeposits(insts[instType]))
         elif instType == 'OISs':
             helpers.extend(parseOISs(insts[instType]))
         elif instType == 'FRAs':
@@ -545,54 +559,154 @@ def parseAll(insts, calc_date=None):
 
 class YieldTermStructureDecorator(object):
     def __init__(self, termStructrure, calendar):
-        self._termStructrure = termStructrure
+        self._term_struct = termStructrure
         self._calendar = calendar
 
-    # The two methods we actually want to specialize,
-    # to log each occasion on which data is written.
+    def __getattr__(self, name):
+        return getattr(self._term_struct, name)
 
-    def zeroRate(self, endDate, compounding=ql.Compounded, freq=ql.Annual):
-        endDate = endDate if isinstance(
-            endDate, ql.Date) else dfs.toQLDate(endDate)
-        compounding = compounding if isinstance(
-            compounding, int) else qlu.getCompoundType(compounding)
-        startDate = self._termStructrure.referenceDate()
-        dc = self._termStructrure.dayCounter()
-        years = dc.yearFraction(startDate, endDate)
-        freq = freq if isinstance(
-            freq, int) else qlu.getFrequency(freq)
-        return self._termStructrure.zeroRate(years, compounding, freq)
-
-    def discount(self, endDate, extrapolate=False):
-        endDate = endDate if isinstance(
-            endDate, ql.Date) else dfs.toQLDate(endDate)
-        return self._termStructrure.discount(endDate, extrapolate)
-
-    def forwardRate(self, startDate, endDate, dayCount=None, compounding=ql.Compounded, freq=ql.Annual):
-        if dayCount is None:
-            dayCount = self._termStructrure.dayCounter()
+    # =======================================================
+    # DiscountFactor discount(const Date&,
+    #      bool extrapolate = false);
+    # -------------------------------------------------------
+    # DiscountFactor discount(Time,
+    #      bool extrapolate = false);
+    # =======================================================
+    def discount(self, *args):
+        if isinstance(args[0], ql.Date) or dfs.isYYYYMMDD(args[0]):
+            newArgs = [
+                dfs.toQLDate(args[0])
+            ]
         else:
-            dayCount = dayCount if isinstance(
-                dayCount, ql.DayCounter) else qlu.getDayCountBasis(dayCount)
-        startDate = startDate if isinstance(
-            startDate, ql.Date) else dfs.toQLDate(startDate)
-        endDate = endDate if isinstance(
-            endDate, ql.Date) else dfs.toQLDate(endDate)
-        compounding = compounding if isinstance(
-            compounding, int) else qlu.getCompoundType(compounding)
-        freq = freq if isinstance(
-            freq, int) else qlu.getFrequency(freq)
-        return self._termStructrure.forwardRate(startDate, endDate, dayCount, compounding, freq)
+            newArgs = [
+                args[0]
+            ]
+
+        if len(args) > 1:
+            newArgs.append(args[1])
+
+        return self._term_struct.discount(*tuple(newArgs))
+
+    # =======================================================
+    # InterestRate zeroRate(const Date& d,
+    #      const DayCounter&,
+    #      Compounding,
+    #      Frequency f = Annual,
+    #      bool extrapolate = false) const;
+    # -------------------------------------------------------
+    # InterestRate zeroRate(Time t,
+    #      Compounding,
+    #      Frequency f = Annual,
+    #      bool extrapolate = false) const;
+    # =======================================================
+    def zeroRate(self, *args):
+        if isinstance(args[1], ql.DayCounter) or isinstance(args[1], str):
+            newArgs = [
+                dfs.toQLDate(args[0]),
+                qlu.getDayCountBasis(args[1]),
+                qlu.getCompoundType(args[2])
+            ]
+
+            if len(args) > 3:
+                newArgs.append(qlu.getFrequency(args[3]))
+            if len(args) > 4:
+                newArgs.append(args[4])
+        else:
+            newArgs = [
+                args[0],
+                qlu.getCompoundType(args[1])
+            ]
+
+            if len(args) > 2:
+                newArgs.append(qlu.getFrequency(args[2]))
+            if len(args) > 3:
+                newArgs.append(args[3])
+
+        return self._term_struct.zeroRate(*tuple(newArgs))
+
+    # =======================================================
+    # InterestRate forwardRate(const Date& d1,
+    #      const Date& d2,
+    #      const DayCounter&,
+    #      Compounding,
+    #      Frequency f = Annual,
+    #      bool extrapolate = false) const;
+    # -------------------------------------------------------
+    # InterestRate forwardRate(Time t1,
+    #      Time t2,
+    #      Compounding,
+    #      Frequency f = Annual,
+    #      bool extrapolate = false) const;
+    # =======================================================
+    def forwardRate(self, *args):
+        if isinstance(args[2], ql.DayCounter) or isinstance(args[2], str):
+            newArgs = [
+                dfs.toQLDate(args[0]),
+                dfs.toQLDate(args[1]),
+                qlu.getDayCountBasis(args[2]),
+                qlu.getCompoundType(args[3])
+            ]
+
+            if len(args) > 4:
+                newArgs.append(qlu.getFrequency(args[4]))
+            if len(args) > 5:
+                newArgs.append(args[5])
+        else:
+            newArgs = [
+                args[0],
+                args[1],
+                qlu.getCompoundType(args[2])
+            ]
+
+            if len(args) > 3:
+                newArgs.append(qlu.getFrequency(args[3]))
+            if len(args) > 4:
+                newArgs.append(args[4])
+
+        return self._term_struct.forwardRate(*tuple(newArgs))
+
+    # def zeroRate(self, endDate, compounding=ql.Compounded, freq=ql.Annual):
+    #     endDate = endDate if isinstance(
+    #         endDate, ql.Date) else dfs.toQLDate(endDate)
+    #     compounding = compounding if isinstance(
+    #         compounding, int) else qlu.getCompoundType(compounding)
+    #     startDate = self._term_struct.referenceDate()
+    #     dc = self._term_struct.dayCounter()
+    #     years = dc.yearFraction(startDate, endDate)
+    #     freq = freq if isinstance(
+    #         freq, int) else qlu.getFrequency(freq)
+    #     return self._term_struct.zeroRate(years, compounding, freq)
+
+    # def discount(self, endDate, extrapolate=False):
+    #     endDate = endDate if isinstance(
+    #         endDate, ql.Date) else dfs.toQLDate(endDate)
+    #     return self._term_struct.discount(endDate, extrapolate)
+
+    # def forwardRate(self, startDate, endDate, dayCount=None, compounding=ql.Compounded, freq=ql.Annual):
+    #     if dayCount is None:
+    #         dayCount = self._term_struct.dayCounter()
+    #     else:
+    #         dayCount = dayCount if isinstance(
+    #             dayCount, ql.DayCounter) else qlu.getDayCountBasis(dayCount)
+    #     startDate = startDate if isinstance(
+    #         startDate, ql.Date) else dfs.toQLDate(startDate)
+    #     endDate = endDate if isinstance(
+    #         endDate, ql.Date) else dfs.toQLDate(endDate)
+    #     compounding = compounding if isinstance(
+    #         compounding, int) else qlu.getCompoundType(compounding)
+    #     freq = freq if isinstance(
+    #         freq, int) else qlu.getFrequency(freq)
+    #     return self._term_struct.forwardRate(startDate, endDate, dayCount, compounding, freq)
 
     def oneDayForwardRates(self, period, calendar, startDate=None, dayCount=None, compounding=ql.Compounded, freq=ql.Annual):
-        startDate = startDate if startDate is not None else self._termStructrure.referenceDate()
+        startDate = startDate if startDate is not None else self._term_struct.referenceDate()
         startDate = startDate if isinstance(
             startDate, ql.Date) else dfs.toQLDate(startDate)
         period = period if isinstance(
             period, ql.Period) else qlu.parseTenor(period)
         endDate = startDate + period
         if dayCount is None:
-            dayCount = self._termStructrure.dayCounter()
+            dayCount = self._term_struct.dayCounter()
         else:
             dayCount = dayCount if isinstance(
                 dayCount, ql.DayCounter) else qlu.getDayCountBasis(dayCount)
@@ -604,7 +718,7 @@ class YieldTermStructureDecorator(object):
             raise RuntimeError('You must provide a calendar')
 
         if calendar is None:
-            calendar = self._termStructrure.calendar()
+            calendar = self._term_struct.calendar()
         else:
             calendar = calendar if isinstance(
                 calendar, ql.Calendar) else mgr.getCalendar(calendar)
@@ -620,21 +734,21 @@ class YieldTermStructureDecorator(object):
     # but iter() and next() will be upset without them.
 
     # def __iter__(self):
-    #     return self._termStructrure.__iter__()
+    #     return self._term_struct.__iter__()
 
     # def __next__(self):
-    #     return self._termStructrure.__next__()
+    #     return self._term_struct.__next__()
 
     # Offer every other method and property dynamically.
 
-    def __getattr__(self, name):
-        return getattr(self._termStructrure, name)
+    # def __getattr__(self, name):
+    #     return getattr(self._term_struct, name)
 
     # def __setattr__(self, name, value):
-    #     setattr(self._termStructrure, name, value)
+    #     setattr(self._term_struct, name, value)
 
     # def __delattr__(self, name):
-    #     delattr(self._termStructrure, name)
+    #     delattr(self._term_struct, name)
 
 
 """
