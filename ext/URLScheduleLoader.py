@@ -15,10 +15,10 @@
 
 from . import Config as config
 from . import Utils as utils
-from .ScheduleLoader import ScheduleLoader
+from .DataLoader import DataLoader
 
 
-class URLScheduleLoader(ScheduleLoader):
+class URLScheduleLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
         self.scheduleUrl = None

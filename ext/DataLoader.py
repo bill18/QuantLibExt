@@ -21,4 +21,4 @@ class DataLoader(object):
 
     def load(self, calId):
         raise RuntimeError(
-            "This is the super class of all calendar loaders, please use any concret one")
+            "This is the super class of all data loaders (calendar/schedule/curve, etc), please use any concret one")

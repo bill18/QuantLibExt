@@ -18,10 +18,10 @@ import sqlite3
 import json
 
 from . import Config as config
-from .ScheduleLoader import ScheduleLoader
+from .DataLoader import DataLoader
 
 
-class SQLiteScheduleLoader(ScheduleLoader):
+class SQLiteScheduleLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
