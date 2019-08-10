@@ -18,13 +18,25 @@ from . import Utils as utils
 from .DataLoader import DataLoader
 
 
-class URLCurveReqLoader(DataLoader):
+class FileCurveReqLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
     def load(self, curveId):
         filePath = config.getCurveInputFile(curveId + '.json')
         instFileUrl = 'file:///' + filePath
+
+        req = utils.loadJsonFromUrl(instFileUrl)
+
+        return req
+
+
+class URLCurveReqLoader(DataLoader):
+    def __init__(self, urlPattern):
+        self.urlPattern = urlPattern
+
+    def load(self, curveId):
+        instFileUrl = self.urlPattern.format(curveId)
 
         req = utils.loadJsonFromUrl(instFileUrl)
 

@@ -14,14 +14,14 @@
 
 
 import os
-import sqlite3
+import mysql.connector
 # import json
 
 from . import Config as config
 from .DataLoader import DataLoader
 
 
-class SQLiteScheduleLoader(DataLoader):
+class MySQLScheduleLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
@@ -33,8 +33,12 @@ class SQLiteScheduleLoader(DataLoader):
         return dbDir
 
     def makeConnection(self):
-        dbPath = os.path.join(self.getDBDir(), 'quantlib.db')
-        conn = sqlite3.connect(dbPath)
+        conn = mysql.connector.connect(
+            host=os.getenv('DB_HOST', "127.0.0.1"),
+            port=os.getenv('DB_PORT', 3306),
+            user=os.getenv('DB_UID', 'your login id'),
+            password=os.getenv('DB_PWD', "your password"),
+            database=os.getenv('DB_NAME', 'quantlib'))
 
         return conn
 
@@ -46,14 +50,14 @@ class SQLiteScheduleLoader(DataLoader):
         c.execute(
             """SELECT rolling, calendar
                FROM schedules
-               WHERE prodCode=?""", params)
+               WHERE prodCode=%s""", params)
         rec = c.fetchone()
         if rec is None:
             raise RuntimeError("schedue for %s was not found" % prodCode)
         c.execute(
             """SELECT date
                FROM schedule_dates
-               WHERE prodCode=?""", params)
+               WHERE prodCode=%s""", params)
         rows = c.fetchall()
 
         # schedule = json.loads(rec[0])

@@ -19,7 +19,7 @@ from . import DatetimeUtils as dfs
 from . import CalendarManager as mgr
 from . import Utils as utils
 from . import QuantLibClassExt as qlx
-from . import URLCurveReqLoader as crvLoder
+from . import CurveReqLoaders as crvLoder
 
 # decorator to add methods to a class on the fly
 
@@ -591,46 +591,46 @@ def buildCurve(curveEngine, asOfDate, basis, insts, calendar=None, enableExtrapo
         return None
 
 
-def PiecewiseCubicZeroCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseCubicZeroCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseCubicZero', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseFlatForwardCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseFlatForwardCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseFlatForward', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseFlatHazardRateCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseFlatHazardRateCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseFlatHazardRate', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseLinearForwardCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseLinearForwardCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseLinearForward', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseLinearZeroCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseLinearZeroCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseLinearZero', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseLogCubicDiscountCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseLogCubicDiscountCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseLogCubicDiscount', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseLogLinearDiscountCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseLogLinearDiscountCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseLogLinearDiscount', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseYoYInflationCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseYoYInflationCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseYoYInflation', asOfDate, basis, insts, calendar, enableExtrapolation)
 
 
-def PiecewiseZeroInflationCurve(asOfDate, basis, curveId, loader=crvLoder.URLCurveReqLoader(), calendar=None, enableExtrapolation=True):
+def PiecewiseZeroInflationCurve(asOfDate, basis, curveId, loader=crvLoder.FileCurveReqLoader(), calendar=None, enableExtrapolation=True):
     insts = loader.load(curveId)
     return buildCurve('PiecewiseZeroInflation', asOfDate, basis, insts, calendar, enableExtrapolation)

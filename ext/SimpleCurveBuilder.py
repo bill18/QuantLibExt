@@ -15,10 +15,10 @@
 import QuantLib as ql
 from . import DatetimeUtils as dtu
 from . import QuantLibClassExt as qlx
-from . import URLCurveReqLoader as crvLoder
+from . import CurveReqLoaders as crvLoder
 
 
-def ZeroCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+def ZeroCurve(asOfDate, curveId, loader=crvLoder.FileCurveReqLoader()):
     # filePath = config.getCurveInputFile(curveId + '.json')
     # instFileUrl = 'file:///' + filePath
 
@@ -32,7 +32,7 @@ def ZeroCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
     return curve
 
 
-def DiscountCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+def DiscountCurve(asOfDate, curveId, loader=crvLoder.FileCurveReqLoader()):
     # filePath = config.getCurveInputFile(curveId + '.json')
     # instFileUrl = 'file:///' + filePath
 
@@ -46,7 +46,7 @@ def DiscountCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
     return curve
 
 
-def ForwardCurve(asOfDate, curveId, loader=crvLoder.URLCurveReqLoader()):
+def ForwardCurve(asOfDate, curveId, loader=crvLoder.FileCurveReqLoader()):
     # filePath = config.getCurveInputFile(curveId + '.json')
     # instFileUrl = 'file:///' + filePath
 

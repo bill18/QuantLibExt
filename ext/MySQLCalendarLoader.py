@@ -14,13 +14,14 @@
 
 
 import os
-import sqlite3
+import mysql.connector
+# import sqlite3
 
 from . import Config as config
 from .DataLoader import DataLoader
 
 
-class SQLiteCalendarLoader(DataLoader):
+class MySQLCalendarLoader(DataLoader):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
@@ -32,8 +33,12 @@ class SQLiteCalendarLoader(DataLoader):
         return dbDir
 
     def makeConnection(self):
-        dbPath = os.path.join(self.getDBDir(), 'quantlib.db')
-        conn = sqlite3.connect(dbPath)
+        conn = mysql.connector.connect(
+            host=os.getenv('DB_HOST', "127.0.0.1"),
+            port=os.getenv('DB_PORT', 3306),
+            user=os.getenv('DB_UID', 'your login id'),
+            password=os.getenv('DB_PWD', "your password"),
+            database=os.getenv('DB_NAME', 'quantlib'))
 
         return conn
 
@@ -41,7 +46,7 @@ class SQLiteCalendarLoader(DataLoader):
         conn = self.makeConnection()
         params = (calName,)
         c = conn.cursor()
-        recs = c.execute('SELECT date FROM calendars WHERE calCode=?', params)
+        recs = c.execute('SELECT date FROM calendars WHERE calCode=%s', params)
         dates = [int(d[0]) for d in recs]
         conn.close()
 

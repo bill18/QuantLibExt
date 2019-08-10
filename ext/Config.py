@@ -16,6 +16,31 @@ import os
 from pathlib import Path
 
 
+def setDBConnectInfo(
+        host,
+        port,
+        user,
+        password,
+        database):
+    os.environ['DB_HOST'] = host
+    os.environ['DB_PORT'] = port
+    os.environ['DB_UID'] = user
+    os.environ['DB_PWD'] = password
+    os.environ['DB_NAME'] = database
+
+
+def setCurveDir(crvDir):
+    os.environ['CURVE_DIR'] = crvDir
+
+
+def setConfigDir(configDir):
+    os.environ['CONFIG_DIR'] = configDir
+
+
+def setCalendarDir(calDir):
+    os.environ['CALENDAR_DIR'] = calDir
+
+
 def getCurrentDir():
     path = Path(__file__).parent.absolute()
     return path
