@@ -1,0 +1,11 @@
+        BMASwapRateHelper(const Handle<Quote>& liborFraction,
+                          const Period& tenor, // swap maturity
+                          Natural settlementDays,
+                          Calendar calendar,
+                          // bma leg
+                          const Period& bmaPeriod,
+                          BusinessDayConvention bmaConvention,
+                          DayCounter bmaDayCount,
+                          ext::shared_ptr<BMAIndex> bmaIndex,
+                          // ibor leg
+                          ext::shared_ptr<IborIndex> index);
