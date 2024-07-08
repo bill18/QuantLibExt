@@ -1,0 +1,56 @@
+        SwapRateHelper(const Handle<Quote>& rate,
+                       const ext::shared_ptr<SwapIndex>& swapIndex,
+                       Handle<Quote> spread = {},
+                       const Period& fwdStart = 0 * Days,
+                       // exogenous discounting curve
+                       Handle<YieldTermStructure> discountingCurve = {},
+                       Pillar::Choice pillar = Pillar::LastRelevantDate,
+                       Date customPillarDate = Date(),
+                       bool endOfMonth = false,
+                       const ext::optional<bool>& useIndexedCoupons = ext::nullopt);
+        SwapRateHelper(const Handle<Quote>& rate,
+                       const Period& tenor,
+                       Calendar calendar,
+                       // fixed leg
+                       Frequency fixedFrequency,
+                       BusinessDayConvention fixedConvention,
+                       DayCounter fixedDayCount,
+                       // floating leg
+                       const ext::shared_ptr<IborIndex>& iborIndex,
+                       Handle<Quote> spread = {},
+                       const Period& fwdStart = 0 * Days,
+                       // exogenous discounting curve
+                       Handle<YieldTermStructure> discountingCurve = {},
+                       Natural settlementDays = Null<Natural>(),
+                       Pillar::Choice pillar = Pillar::LastRelevantDate,
+                       Date customPillarDate = Date(),
+                       bool endOfMonth = false,
+                       const ext::optional<bool>& useIndexedCoupons = ext::nullopt);
+        SwapRateHelper(Rate rate,
+                       const ext::shared_ptr<SwapIndex>& swapIndex,
+                       Handle<Quote> spread = {},
+                       const Period& fwdStart = 0 * Days,
+                       // exogenous discounting curve
+                       Handle<YieldTermStructure> discountingCurve = {},
+                       Pillar::Choice pillar = Pillar::LastRelevantDate,
+                       Date customPillarDate = Date(),
+                       bool endOfMonth = false,
+                       const ext::optional<bool>& useIndexedCoupons = ext::nullopt);
+        SwapRateHelper(Rate rate,
+                       const Period& tenor,
+                       Calendar calendar,
+                       // fixed leg
+                       Frequency fixedFrequency,
+                       BusinessDayConvention fixedConvention,
+                       DayCounter fixedDayCount,
+                       // floating leg
+                       const ext::shared_ptr<IborIndex>& iborIndex,
+                       Handle<Quote> spread = {},
+                       const Period& fwdStart = 0 * Days,
+                       // exogenous discounting curve
+                       Handle<YieldTermStructure> discountingCurve = {},
+                       Natural settlementDays = Null<Natural>(),
+                       Pillar::Choice pillar = Pillar::LastRelevantDate,
+                       Date customPillarDate = Date(),
+                       bool endOfMonth = false,
+                       const ext::optional<bool>& useIndexedCoupons = ext::nullopt);

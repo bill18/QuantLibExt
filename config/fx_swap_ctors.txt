@@ -1,0 +1,10 @@
+        FxSwapRateHelper(const Handle<Quote>& fwdPoint,
+                         Handle<Quote> spotFx,
+                         const Period& tenor,
+                         Natural fixingDays,
+                         Calendar calendar,
+                         BusinessDayConvention convention,
+                         bool endOfMonth,
+                         bool isFxBaseCurrencyCollateralCurrency,
+                         Handle<YieldTermStructure> collateralCurve,
+                         Calendar tradingCalendar = Calendar());

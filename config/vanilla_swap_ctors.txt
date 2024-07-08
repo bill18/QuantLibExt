@@ -1,0 +1,11 @@
+        VanillaSwap(Swap::Type type,
+                    Real nominal,
+                    Schedule fixedSchedule,
+                    Rate fixedRate,
+                    DayCounter fixedDayCount,
+                    Schedule floatSchedule,
+                    ext::shared_ptr<IborIndex> iborIndex,
+                    Spread spread,
+                    DayCounter floatingDayCount,
+                    ext::optional<BusinessDayConvention> paymentConvention = ext::nullopt,
+                    ext::optional<bool> useIndexedCoupons = ext::nullopt);
